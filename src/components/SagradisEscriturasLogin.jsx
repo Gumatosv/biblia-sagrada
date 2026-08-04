@@ -8,8 +8,7 @@ export default function SagradisEscriturasLogin() {
   const navigate = useNavigate();
 
   function handleSearch(query) {
-    console.log("Pesquisando por:", query);
-    // depois: navigate(`/pesquisa?q=${query}`)
+    navigate(`/pesquisa?q=${encodeURIComponent(query)}`);
   }
 
   return (
