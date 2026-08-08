@@ -6,12 +6,14 @@ import ChapterTextPage from "./components/ChapterTextPage";
 import SearchResultsPage from "./components/SearchResultsPage";
 import LoginPage from "./components/LoginPage";
 import UserMenu from "./components/UserMenu";
+import ProgressPage from "./components/ProgressPage";
 
 function App() {
   return (
     <BrowserRouter>
       <UserMenu />
       <Routes>
+        <Route path="/progresso" element={<ProgressPage />} />
         <Route path="/" element={<SagradisEscriturasLogin />} />
         <Route path="/leitura" element={<BooksPage />} />
         <Route path="/leitura/:book" element={<ChaptersPage />} />
