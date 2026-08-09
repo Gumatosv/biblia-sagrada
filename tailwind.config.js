@@ -2,8 +2,11 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+  extend: {
+    fontFamily: {
+      serif: ['"Cormorant Garamond"', "serif"],
+      sans: ["Inter", "sans-serif"],
+    },
   },
-  plugins: [],
+},
 }
-

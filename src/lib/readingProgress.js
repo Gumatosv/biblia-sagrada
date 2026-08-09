@@ -99,4 +99,21 @@ export async function markBookAsUnread(userId, livro) {
   }
 
   return true;
+  
+}
+export async function getLastRead(userId) {
+  const { data, error } = await supabase
+    .from("capitulos_lidos")
+    .select("livro, capitulo, lido_em")
+    .eq("user_id", userId)
+    .order("lido_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Erro ao buscar último lido:", error);
+    return null;
+  }
+
+  return data;
 }
