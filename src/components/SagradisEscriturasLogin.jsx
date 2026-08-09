@@ -73,7 +73,7 @@ export default function SagradisEscriturasLogin() {
         <div className="flex items-center justify-center gap-3">
           <BookOpen className="w-8 h-8 sm:w-9 sm:h-9 text-amber-300" strokeWidth={1.5} />
           <h1 className="font-serif font-bold text-5xl sm:text-6xl text-white tracking-wide">
-            Bíblia sagrada
+            BÍBLIA SAGRADA
           </h1>
         </div>
 
