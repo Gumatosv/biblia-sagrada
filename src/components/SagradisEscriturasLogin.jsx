@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Heart, TrendingUp, Bookmark, ChevronRight } from "lucide-react";
-import { supabase } from "../lib/supabase";
-import { getLastRead } from "../lib/readingProgress";
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 const DAILY_VERSES = [
   { book: "João", chapter: 3, verse: 16 },
@@ -25,10 +25,10 @@ const features = [
 
 export default function SagradisEscriturasLogin() {
   const navigate = useNavigate();
+  const { session, lastRead } = useAuth();
+  const { theme } = useTheme();
   const [verseText, setVerseText] = useState("");
   const [verseRef, setVerseRef] = useState(null);
-  const [session, setSession] = useState(null);
-  const [lastRead, setLastRead] = useState(null);
 
   useEffect(() => {
     const dayOfYear = Math.floor(
@@ -52,38 +52,30 @@ export default function SagradisEscriturasLogin() {
       });
   }, []);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-  }, []);
-
-  useEffect(() => {
-    if (!session) return;
-    getLastRead(session.user.id).then(setLastRead);
-  }, [session]);
+  const backgroundStyle =
+    theme === "dark"
+      ? { backgroundImage: "linear-gradient(135deg, #000000 0%, #0a1128 45%, #001233 100%)" }
+      : { backgroundImage: "linear-gradient(135deg, #fdfaf3 0%, #f7efdf 50%, #f5ead6 100%)" };
 
   return (
-    <div
-      className="min-h-screen w-full p-6 sm:p-10"
-      style={{
-        backgroundImage:
-          "linear-gradient(135deg, #000000 0%, #0a1128 45%, #001233 100%)",
-      }}
-    >
+    <div className="min-h-screen w-full p-6 sm:p-10" style={backgroundStyle}>
       <div className="text-center max-w-3xl mx-auto pt-14">
         <div className="flex items-center justify-center gap-3">
-          <BookOpen className="w-8 h-8 sm:w-9 sm:h-9 text-amber-300" strokeWidth={1.5} />
-          <h1 className="font-serif font-bold text-5xl sm:text-6xl text-white tracking-wide">
-            BÍBLIA SAGRADA
+          <BookOpen className="w-8 h-8 sm:w-9 sm:h-9 text-amber-500 dark:text-amber-300" strokeWidth={1.5} />
+          <h1 className="font-serif font-bold text-5xl sm:text-6xl text-stone-900 dark:text-white tracking-wide">
+            Bíblia sagrada
           </h1>
         </div>
 
         {verseRef && verseText && (
           <button
             onClick={() => navigate(`/leitura/${encodeURIComponent(verseRef.book)}/${verseRef.chapter}?v=${verseRef.verse}`)}
-            className="block w-full text-left mt-10 rounded-2xl border border-white/10 bg-white/5 px-7 py-6 hover:bg-white/10 transition-colors"
+            className="block w-full text-left mt-10 rounded-2xl border border-stone-300 dark:border-white/10 bg-white/60 dark:bg-white/5 px-7 py-6 hover:bg-white dark:hover:bg-white/10 transition-colors"
           >
-            <p className="text-white/40 text-xs tracking-widest uppercase mb-3">Versículo do dia</p>
-            <p className="text-white/85 text-base leading-relaxed">
+            <p className="text-stone-500 dark:text-white/40 text-xs tracking-widest uppercase mb-3">
+              Versículo do dia
+            </p>
+            <p className="text-stone-800 dark:text-white/85 text-base leading-relaxed">
               {verseRef.book} {verseRef.chapter}:{verseRef.verse} — {verseText}
             </p>
           </button>
@@ -92,13 +84,13 @@ export default function SagradisEscriturasLogin() {
         {session && lastRead && (
           <button
             onClick={() => navigate(`/leitura/${encodeURIComponent(lastRead.livro)}/${lastRead.capitulo}`)}
-            className="w-full flex items-center justify-between mt-4 rounded-xl border border-white/[0.08] bg-white/[0.03] px-5 py-4 hover:bg-white/[0.06] transition-colors"
+            className="w-full flex items-center justify-between mt-4 rounded-xl border border-stone-300/70 dark:border-white/[0.08] bg-white/40 dark:bg-white/[0.03] px-5 py-4 hover:bg-white/70 dark:hover:bg-white/[0.06] transition-colors"
           >
-            <span className="flex items-center gap-2 text-white/55 text-sm">
-              <Bookmark className="w-3.5 h-3.5 text-amber-300/70" strokeWidth={1.5} />
+            <span className="flex items-center gap-2 text-stone-600 dark:text-white/55 text-sm">
+              <Bookmark className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300/70" strokeWidth={1.5} />
               Continuar lendo · {lastRead.livro} {lastRead.capitulo}
             </span>
-            <ChevronRight className="w-3.5 h-3.5 text-white/40" strokeWidth={1.5} />
+            <ChevronRight className="w-3.5 h-3.5 text-stone-400 dark:text-white/40" strokeWidth={1.5} />
           </button>
         )}
 
@@ -107,10 +99,10 @@ export default function SagradisEscriturasLogin() {
             <button
               key={feature.title}
               onClick={() => navigate(feature.path)}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-7 hover:bg-white/10 transition-colors"
+              className="rounded-2xl border border-stone-300 dark:border-white/10 bg-white/60 dark:bg-white/5 px-4 py-7 hover:bg-white dark:hover:bg-white/10 transition-colors"
             >
-              <feature.icon className="w-7 h-7 text-amber-300 mx-auto" strokeWidth={1.5} />
-              <p className="text-white text-lg font-medium mt-3.5">{feature.title}</p>
+              <feature.icon className="w-7 h-7 text-amber-600 dark:text-amber-300 mx-auto" strokeWidth={1.5} />
+              <p className="text-stone-800 dark:text-white text-lg font-medium mt-3.5">{feature.title}</p>
             </button>
           ))}
         </div>
