@@ -3,24 +3,26 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { bookAbbreviations } from "../data/bookAbbreviations";
 import { chapterCounts } from "../data/books";
-import { supabase } from "../lib/supabase";
 import {
   isChapterRead,
   markChapterAsRead,
   markChapterAsUnread,
 } from "../lib/readingProgress";
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ChapterTextPage() {
   const { book, chapter } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const targetVerse = parseInt(searchParams.get("v"), 10);
+  const { session, refreshLastRead } = useAuth();
+  const { theme } = useTheme();
 
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [session, setSession] = useState(null);
   const [isRead, setIsRead] = useState(false);
   const [savingProgress, setSavingProgress] = useState(false);
 
@@ -29,7 +31,6 @@ export default function ChapterTextPage() {
   const hasPrevious = currentChapter > 1;
   const hasNext = currentChapter < totalChapters;
 
-  // Busca o texto do capítulo
   useEffect(() => {
     const abbrev = bookAbbreviations[book];
 
@@ -69,7 +70,6 @@ export default function ChapterTextPage() {
       });
   }, [book, chapter, currentChapter]);
 
-  // Rola até o versículo buscado
   useEffect(() => {
     if (!loading && !error && targetVerse) {
       const el = document.getElementById(`verse-${targetVerse}`);
@@ -79,20 +79,6 @@ export default function ChapterTextPage() {
     }
   }, [loading, error, targetVerse, verses]);
 
-  // Verifica se o usuário está logado
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
-  // Verifica se esse capítulo já foi lido (só se estiver logado)
   useEffect(() => {
     if (!session) {
       setIsRead(false);
@@ -118,6 +104,7 @@ export default function ChapterTextPage() {
       if (success) setIsRead(true);
     }
 
+    refreshLastRead();
     setSavingProgress(false);
   }
 
@@ -126,24 +113,23 @@ export default function ChapterTextPage() {
     window.scrollTo(0, 0);
   }
 
+  const backgroundStyle =
+    theme === "dark"
+      ? { backgroundImage: "linear-gradient(135deg, #000000 0%, #0a1128 45%, #001233 100%)" }
+      : { backgroundImage: "linear-gradient(135deg, #fdfaf3 0%, #f7efdf 50%, #f5ead6 100%)" };
+
   return (
-    <div
-      className="min-h-screen w-full p-6 sm:p-10"
-      style={{
-        backgroundImage:
-          "linear-gradient(135deg, #000000 0%, #0a1128 45%, #001233 100%)",
-      }}
-    >
+    <div className="min-h-screen w-full p-6 sm:p-10" style={backgroundStyle}>
       <div className="max-w-3xl mx-auto">
         <button
           onClick={() => navigate(`/leitura/${encodeURIComponent(book)}`)}
-          className="text-white/50 text-sm mb-6 hover:text-white/80 transition-colors"
+          className="text-stone-500 dark:text-white/50 text-sm mb-6 hover:text-stone-800 dark:hover:text-white/80 transition-colors"
         >
           ← Voltar para capítulos
         </button>
 
         <div className="flex items-center justify-between mb-8 gap-4">
-          <h1 className="font-serif text-3xl sm:text-4xl text-white">
+          <h1 className="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-white">
             {book} {chapter}
           </h1>
 
@@ -152,8 +138,8 @@ export default function ChapterTextPage() {
             disabled={savingProgress}
             className={`flex items-center gap-2 text-sm rounded-full px-4 py-2.5 border transition-colors shrink-0 disabled:opacity-50 ${
               isRead
-                ? "bg-amber-500/20 border-amber-400/40 text-amber-200"
-                : "bg-white/5 border-white/15 text-white/70 hover:bg-white/10 hover:border-white/30"
+                ? "bg-amber-500/20 border-amber-400/40 text-amber-700 dark:text-amber-200"
+                : "bg-white/60 dark:bg-white/5 border-stone-300 dark:border-white/15 text-stone-600 dark:text-white/70 hover:bg-white dark:hover:bg-white/10 hover:border-stone-400 dark:hover:border-white/30"
             }`}
           >
             <Check className="w-4 h-4" strokeWidth={2} />
@@ -161,8 +147,8 @@ export default function ChapterTextPage() {
           </button>
         </div>
 
-        {loading && <p className="text-white/60">Carregando...</p>}
-        {error && <p className="text-red-400">{error}</p>}
+        {loading && <p className="text-stone-500 dark:text-white/60">Carregando...</p>}
+        {error && <p className="text-red-500 dark:text-red-400">{error}</p>}
 
         {!loading && !error && (
           <>
@@ -174,22 +160,22 @@ export default function ChapterTextPage() {
                   <p
                     key={index}
                     id={`verse-${verseNumber}`}
-                    className={`text-white/80 leading-relaxed rounded-lg transition-colors ${
-                      isTarget ? "bg-amber-300/10 -mx-3 px-3 py-2" : ""
+                    className={`text-stone-800 dark:text-white/80 leading-relaxed rounded-lg transition-colors ${
+                      isTarget ? "bg-amber-200/40 dark:bg-amber-300/10 -mx-3 px-3 py-2" : ""
                     }`}
                   >
-                    <span className="text-amber-300 font-medium mr-2">{verseNumber}</span>
+                    <span className="text-amber-600 dark:text-amber-300 font-medium mr-2">{verseNumber}</span>
                     {text}
                   </p>
                 );
               })}
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/10 pt-6">
+            <div className="flex items-center justify-between border-t border-stone-300 dark:border-white/10 pt-6">
               <button
                 onClick={() => goToChapter(currentChapter - 1)}
                 disabled={!hasPrevious}
-                className="flex items-center gap-2 text-white/80 border border-white/15 bg-white/5 rounded-full px-5 py-2.5 hover:border-amber-300/40 hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                className="flex items-center gap-2 text-stone-700 dark:text-white/80 border border-stone-300 dark:border-white/15 bg-white/60 dark:bg-white/5 rounded-full px-5 py-2.5 hover:border-amber-400 dark:hover:border-amber-300/40 hover:bg-white dark:hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
               >
                 <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />
                 Anterior
@@ -198,7 +184,7 @@ export default function ChapterTextPage() {
               <button
                 onClick={() => goToChapter(currentChapter + 1)}
                 disabled={!hasNext}
-                className="flex items-center gap-2 text-white/80 border border-white/15 bg-white/5 rounded-full px-5 py-2.5 hover:border-amber-300/40 hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                className="flex items-center gap-2 text-stone-700 dark:text-white/80 border border-stone-300 dark:border-white/15 bg-white/60 dark:bg-white/5 rounded-full px-5 py-2.5 hover:border-amber-400 dark:hover:border-amber-300/40 hover:bg-white dark:hover:bg-white/10 transition-colors disabled:opacity-30 disabled:pointer-events-none"
               >
                 Próximo
                 <ChevronRight className="w-4 h-4" strokeWidth={1.5} />

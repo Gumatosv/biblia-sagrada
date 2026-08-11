@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { useTheme } from "../context/ThemeContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,14 +39,13 @@ export default function LoginPage() {
     navigate("/");
   }
 
+  const backgroundStyle =
+    theme === "dark"
+      ? { backgroundImage: "linear-gradient(135deg, #000000 0%, #0a1128 45%, #001233 100%)" }
+      : { backgroundImage: "linear-gradient(135deg, #fdfaf3 0%, #f7efdf 50%, #f5ead6 100%)" };
+
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center p-6"
-      style={{
-        backgroundImage:
-          "linear-gradient(135deg, #000000 0%, #0a1128 45%, #001233 100%)",
-      }}
-    >
+    <div className="min-h-screen w-full flex items-center justify-center p-6" style={backgroundStyle}>
       <div className="w-full max-w-md">
         <form
           onSubmit={handleSubmit}
