@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, BookOpen, Search, Sun, Moon } from "lucide-react";
+import { Menu, Home, BookOpen, Search, Sun, Moon } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
