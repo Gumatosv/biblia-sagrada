@@ -9,6 +9,7 @@ import SearchResultsPage from "./components/SearchResultsPage";
 import LoginPage from "./components/LoginPage";
 import ProgressPage from "./components/ProgressPage";
 import Navbar from "./components/Navbar";
+import SignupPage from "./components/SignupPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/pesquisa" element={<SearchResultsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/progresso" element={<ProgressPage />} />
+            <Route path="/cadastro" element={<SignupPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
