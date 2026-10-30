@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { auth } from "../lib/auth";
 import { getLastRead } from "../lib/readingProgress";
 
 const AuthContext = createContext(null);
@@ -9,9 +9,11 @@ export function AuthProvider({ children }) {
   const [lastRead, setLastRead] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => listener.subscription.unsubscribe();
+    let active = true;
+    let changed = false;
+    auth.getSession().then(({ data }) => { if (active && !changed) setSession(data?.session ?? null); });
+    const { data: listener } = auth.onAuthStateChange((_e, s) => { changed = true; setSession(s); });
+    return () => { active = false; listener.subscription.unsubscribe(); };
   }, []);
 
   useEffect(() => {
@@ -19,11 +21,14 @@ export function AuthProvider({ children }) {
       setLastRead(null);
       return;
     }
-    getLastRead(session.user.id).then(setLastRead);
+    let active = true;
+    setLastRead(null);
+    getLastRead(session.user.id).then(data => { if (active) setLastRead(data); }).catch(console.error);
+    return () => { active = false; };
   }, [session]);
 
   function refreshLastRead() {
-    if (session) getLastRead(session.user.id).then(setLastRead);
+    if (session) getLastRead(session.user.id).then(setLastRead).catch(console.error);
   }
 
   return (

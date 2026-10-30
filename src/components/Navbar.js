@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, Home, BookOpen, Search, Sun, Moon } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { Menu, BookOpen, Search, Sun, Moon } from "lucide-react";
+import { auth } from "../lib/auth";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
@@ -19,12 +19,17 @@ export default function Navbar() {
         setMenuOpen(false);
       }
     }
+    const handleEscape = (event) => { if (event.key === "Escape") setMenuOpen(false); };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, []);
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await auth.signOut();
     setMenuOpen(false);
     navigate("/");
   }
@@ -37,10 +42,13 @@ export default function Navbar() {
   }
 
   return (
-    <div className="w-full bg-[#f7efdf] dark:bg-[#0d1b3d] border-b border-stone-300 dark:border-white/10">
-      <div className="relative w-full px-4 sm:px-8 py-4 flex items-center">
+    <header className="w-full bg-[#faf7f0] dark:bg-[#0b1423] border-b border-stone-200 dark:border-white/10">
+      <div className="relative w-full max-w-[1160px] mx-auto px-[22px] sm:px-10 py-4 flex items-center justify-between gap-5">
         <div className="flex items-center gap-3 relative z-10" ref={menuRef}>
           <button
+            aria-label="Abrir menu de navegação"
+            aria-expanded={menuOpen}
+            aria-controls="navigation-menu"
             onClick={() => setMenuOpen((o) => !o)}
             className="text-stone-700 dark:text-white/80 hover:text-stone-900 dark:hover:text-white transition-colors"
           >
@@ -55,7 +63,7 @@ export default function Navbar() {
           </button>
 
           {menuOpen && (
-            <div className="absolute top-10 left-0 w-52 rounded-xl border border-stone-300 dark:border-white/15 bg-white dark:bg-[#0a1128] shadow-xl overflow-hidden z-50">
+            <nav id="navigation-menu" aria-label="Navegação principal" className="absolute top-10 left-0 w-52 rounded-xl border border-stone-300 dark:border-white/15 bg-white dark:bg-[#0a1128] shadow-xl overflow-hidden z-50">
               {session ? (
                 <>
                   <p className="px-4 py-3 text-xs text-stone-500 dark:text-white/50 border-b border-stone-200 dark:border-white/10 truncate">
@@ -106,24 +114,26 @@ export default function Navbar() {
                   </>
                 )}
               </button>
-            </div>
+            </nav>
           )}
         </div>
 
         <form
           onSubmit={handleSearch}
-          className="hidden sm:flex items-center gap-2 w-full max-w-xs absolute left-1/2 -translate-x-1/2 rounded-full border border-stone-300 dark:border-white/10 bg-white/70 dark:bg-white/5 px-4 py-2.5"
+          role="search"
+          className="hidden sm:flex items-center gap-2 w-full max-w-xs rounded-full border border-stone-300 dark:border-white/10 bg-white/70 dark:bg-white/5 px-4 py-2.5"
         >
           <Search className="w-4 h-4 text-stone-400 dark:text-white/40 shrink-0" strokeWidth={1.5} />
           <input
             type="text"
+            aria-label="Pesquisar na Bíblia"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Pesquisar..."
-            className="flex-1 bg-transparent outline-none text-stone-800 dark:text-white text-sm placeholder:text-stone-400 dark:placeholder:text-white/35"
+            className="min-w-0 flex-1 bg-transparent outline-none text-stone-800 dark:text-white text-sm placeholder:text-stone-400 dark:placeholder:text-white/35"
           />
         </form>
       </div>
-    </div>
+    </header>
   );
 }

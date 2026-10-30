@@ -29,6 +29,10 @@ O **Bíblia Sagrada** é um aplicativo web feito em React para leitura da bíbli
 - 📈 **Progresso** — acompanhe sua jornada de leitura
 - 🔍 **Busca** — encontre versículos, capítulos ou livros rapidamente
 
+## Banco de dados e API
+
+O projeto agora utiliza uma API Python com Flask preparada para MariaDB para cadastro, login, progresso e metas. Consulte [server/README.md](server/README.md) para configurar o banco, iniciar a API e planejar a transferência dos dados do Supabase. A transferência das contas existentes ainda exige exportação e uma estratégia para as senhas.
+
 ## Tecnologias
 
 - React

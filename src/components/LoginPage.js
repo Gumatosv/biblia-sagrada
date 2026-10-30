@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { auth } from "../lib/auth";
 import { useTheme } from "../context/ThemeContext";
 
 export default function LoginPage() {
@@ -24,7 +24,7 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    const { error: loginError } = await supabase.auth.signInWithPassword({
+    const { error: loginError } = await auth.signInWithPassword({
       email,
       password,
     });
@@ -32,7 +32,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (loginError) {
-      setError("E-mail ou senha incorretos.");
+      setError(loginError.message);
       return;
     }
 

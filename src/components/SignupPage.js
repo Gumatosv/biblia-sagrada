@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff, Calendar, CreditCard } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { auth } from "../lib/auth";
 import { useTheme } from "../context/ThemeContext";
  
 export default function SignupPage() {
@@ -57,7 +57,7 @@ export default function SignupPage() {
     setLoading(true);
  
     
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpError } = await auth.signUp({
       email,
       password,
       options: {

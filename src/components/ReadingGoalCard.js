@@ -41,16 +41,22 @@ export default function ReadingGoalCard({ userId, totals }) {
   const [formData, setFormData] = useState("");
  
   useEffect(() => {
-    if (!userId) return;
+    let active = true;
+    setGoal(null);
+    if (!userId) { setLoading(false); return; }
     setLoading(true);
     getReadingGoal(userId).then((data) => {
+      if (!active) return;
       setGoal(data);
       if (data) {
         setFormEscopo(data.escopo);
         setFormData(data.data_alvo);
       }
       setLoading(false);
+    }).catch(error => {
+      if (active) { window.alert(error.message); setLoading(false); }
     });
+    return () => { active = false; };
   }, [userId]);
  
   async function handleSave() {

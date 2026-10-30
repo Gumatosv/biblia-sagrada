@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { auth } from "../lib/auth";
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -10,11 +10,11 @@ export default function UserMenu() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    auth.getSession().then(({ data }) => {
+      setSession(data?.session ?? null);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: listener } = auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
     });
 
@@ -32,7 +32,7 @@ export default function UserMenu() {
   }, []);
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await auth.signOut();
     setOpen(false);
     navigate("/");
   }

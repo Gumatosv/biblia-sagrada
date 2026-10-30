@@ -85,7 +85,12 @@ export default function ChapterTextPage() {
       return;
     }
 
-    isChapterRead(session.user.id, book, currentChapter).then(setIsRead);
+    let active = true;
+    setIsRead(false);
+    isChapterRead(session.user.id, book, currentChapter)
+      .then(value => { if (active) setIsRead(value); })
+      .catch(error => { if (active) window.alert(error.message); });
+    return () => { active = false; };
   }, [session, book, currentChapter]);
 
   async function handleToggleRead() {

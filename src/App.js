@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import SagradisEscriturasLogin from "./components/SagradisEscriturasLogin";
+import HomePage from "./components/HomePage";
 import BooksPage from "./components/BooksPage";
 import ChaptersPage from "./components/ChaptersPage";
 import ChapterTextPage from "./components/ChapterTextPage";
@@ -18,7 +18,7 @@ function App() {
         <BrowserRouter>
           <Navbar />
           <Routes>
-            <Route path="/" element={<SagradisEscriturasLogin />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/leitura" element={<BooksPage />} />
             <Route path="/leitura/:book" element={<ChaptersPage />} />
             <Route path="/leitura/:book/:chapter" element={<ChapterTextPage />} />

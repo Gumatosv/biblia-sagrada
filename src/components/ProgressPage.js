@@ -189,6 +189,8 @@ export default function ProgressPage() {
   const userIdRef = useRef(null);
  
   useEffect(() => {
+    userIdRef.current = session?.user.id || null;
+    setReadData({});
     if (!session) {
       setLoading(false);
       return;
@@ -202,7 +204,13 @@ export default function ProgressPage() {
         setReadData(data);
         setLoading(false);
       }
+    }).catch((error) => {
+      if (userIdRef.current === session.user.id) {
+        window.alert(error.message);
+        setLoading(false);
+      }
     });
+    return () => { userIdRef.current = null; };
   }, [session]);
  
   // Único ponto que atualiza o estado local (fonte única de verdade).
@@ -223,6 +231,7 @@ export default function ProgressPage() {
     const ok = wasRead
       ? await markChapterAsUnread(userId, book, chapter)
       : await markChapterAsRead(userId, book, chapter);
+    if (userIdRef.current !== userId) return;
  
     // 3) Se falhar, reverte
     if (!ok) {
@@ -250,6 +259,7 @@ export default function ProgressPage() {
     const ok = isFullyRead
       ? await markBookAsUnread(userId, book)
       : await markBookAsRead(userId, book, total);
+    if (userIdRef.current !== userId) return;
  
     // 3) Se falhar, reverte
     if (!ok) {
